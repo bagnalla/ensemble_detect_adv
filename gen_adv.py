@@ -23,42 +23,42 @@ def gen():
     model_names = ['m' + str(i) for i in range(FLAGS.ensemble_size)]
 
     with tf.Graph().as_default():
-        if FLAGS.type in [FGS, CW]:
+        if FLAGS.attack in [FGS, CW]:
             x = tf.placeholder(tf.float32,
                                shape=example_shape(FLAGS.batch_size))
             y = tf.placeholder(tf.int32, shape=(FLAGS.batch_size))
-        elif FLAGS.type in [BI, DF]:
+        elif FLAGS.attack in [BI, DF]:
             x = tf.placeholder(tf.float32, shape=example_shape(1))
             y = tf.placeholder(tf.int32, shape=(1))
-        elif FLAGS.type != RAND:
+        elif FLAGS.attack != RAND:
             print('Unrecognized attack type.')
             return
 
-        if FLAGS.type not in [CW, RAND]:
+        if FLAGS.attack not in [CW, RAND]:
             logits = [model.inference(x, name) for name in model_names]
             loss = model.adv_loss(logits, y, lam=FLAGS.lam)
-        if FLAGS.type == DF:
+        if FLAGS.attack == DF:
             sum_logits = tf.reduce_sum(logits, axis=0)
 
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
 
-        if FLAGS.type not in [CW, RAND]:
+        if FLAGS.attack not in [CW, RAND]:
             model.load_weights(sess, model_names, FLAGS.model_dir)
 
         # Fast gradient sign
-        if FLAGS.type == FGS:
+        if FLAGS.attack == FGS:
             fgs_op = FGS_op(loss, x, FLAGS.epsilon)
             adv_examples = gen_FGS_set(sess, x, y, fgs_op, images, labels,
                                        FLAGS.batch_size)
 
         # Basic iterative
-        elif FLAGS.type == BI:
+        elif FLAGS.attack == BI:
             adv_examples = basic_set(sess, x, y, FLAGS.epsilon, loss,
                                      images, labels, num_iters=10)
 
         # DeepFool
-        elif FLAGS.type == DF:
+        elif FLAGS.attack == DF:
             pred_op = model.predictions(sum_logits)
             grad_ops = [tf.gradients(sum_logits[:, i], x)
                         for i in range(int(sum_logits.get_shape()[1]))]
@@ -66,7 +66,7 @@ def gen():
                 sess, x, y, sum_logits, pred_op, grad_ops, images, NUM_CLASSES)
 
         # C&W l2
-        elif FLAGS.type == CW:
+        elif FLAGS.attack == CW:
             adv_examples = cw_attack(sess, dataset=FLAGS.dataset,
                                      ensemble_size=FLAGS.ensemble_size,
                                      model_dir=FLAGS.model_dir,
@@ -74,7 +74,7 @@ def gen():
                                      num_samples=images.shape[0])
 
         # Random noise
-        elif FLAGS.type == RAND:
+        elif FLAGS.attack == RAND:
             adv_examples = images + random_perturbation(images.shape,
                                                         FLAGS.epsilon,)
         else:
@@ -84,7 +84,7 @@ def gen():
         if FLAGS.direct == 1:
             dir = 'adv_examples/'
         else:
-            dir = 'adv_examples/' + str(FLAGS.type) + '_' + str(FLAGS.epsilon)
+            dir = 'adv_examples/' + str(FLAGS.attack) + '_' + str(FLAGS.epsilon)
         os.makedirs(dir, exist_ok=True)
 
         # The attacks should produce clipped examples already, but we
@@ -128,10 +128,10 @@ if __name__ == '__main__':
         help='Directory to load the weights from.'
     )
     parser.add_argument(
-        '-t', '--type',
+        '-a', '--attack',
         type=int,
         default=0,
-        help='0) FGS. 1) Basic iterative. 3) DF. 4) random noise.'
+        help='0) FGS. 1) Basic iterative. 2) DeepFool. 3) C&W l2. 4) random noise.'
     )
     parser.add_argument(
         '--direct',

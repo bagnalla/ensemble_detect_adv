@@ -57,7 +57,7 @@ def cifar10_load_data():
 
 # Choose either MNIST or CIFAR10
 def choose_dataset(set_name):
-    if set_name == 'MNIST':
+    if set_name.lower() == 'mnist':
         return mnist_model, mnist_save_images, MNIST_NUM_CLASSES, \
             MNIST_IMAGE_SIZE, mnist_example_shape, mnist_load_data
     else:

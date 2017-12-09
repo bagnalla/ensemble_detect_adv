@@ -33,7 +33,7 @@ def train_ensemble(model, x, y,model_names, loss_op, train_images,
                                      train_labels[minibatch]
 
         adv_images = batch_images + random_perturbation(
-            batch_images.shape, FLAGS.epsilon)
+            batch_images.shape, FLAGS.eta)
         batch_images = np.append(batch_images, adv_images, axis=0)
         batch_labels = np.append(batch_labels, batch_labels)
 
@@ -118,10 +118,10 @@ if __name__ == '__main__':
         help='Number of ensemble members.'
     )
     parser.add_argument(
-        '--epsilon', '-e',
+        '--eta',
         type=float,
         default=0.03,
-        help='Epsilon parameter (range of random perturbation).'
+        help='Eta parameter (range of random perturbation).'
     )
     parser.add_argument(
         '-d', '--dataset',
