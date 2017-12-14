@@ -1,5 +1,7 @@
 # Training Ensembles to Detect Adversarial Examples
 
+See the paper [here](https://arxiv.org/abs/1712.04006).
+
 ## Requisites
 
 [Python 3](https://www.python.org/), [NumPy](http://www.numpy.org/), and [TensorFlow](https://www.tensorflow.org/)
