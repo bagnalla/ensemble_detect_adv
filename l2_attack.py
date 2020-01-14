@@ -23,7 +23,7 @@ class CarliniL2:
                  binary_search_steps = BINARY_SEARCH_STEPS, max_iterations = MAX_ITERATIONS,
                  abort_early = ABORT_EARLY, 
                  initial_const = INITIAL_CONST,
-                 boxmin = -0.5, boxmax = 0.5):
+                 boxmin = 0.0, boxmax = 1.0):
         """
         The L_2 optimized attack. 
 

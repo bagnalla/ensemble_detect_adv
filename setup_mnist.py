@@ -20,7 +20,7 @@ def extract_data(filename, num_images):
         bytestream.read(16)
         buf = bytestream.read(num_images*28*28)
         data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
-        data = (data / 255) - 0.5
+        data = (data / 255)
         data = data.reshape(num_images, 28, 28, 1)
         return data
 
