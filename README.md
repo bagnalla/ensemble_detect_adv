@@ -29,6 +29,7 @@ Some important parameters:
 * `--learning_rate` to set the initial learning rate
 * `--eta` to set the eta parameter to control random perturbation
 * `-d, --dataset` to choose between MNIST and CIFAR10
+
 See the file for other parameters.
 
 #### Example
